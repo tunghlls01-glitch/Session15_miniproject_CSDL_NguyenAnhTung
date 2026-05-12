@@ -119,6 +119,9 @@ begin
     end if;
 end $$
 DELIMITER ;
+-- test --
+CALL create_account('an', '123456', 'an2@gmail.com', @msg);
+SELECT @msg;
 
 -- F02: đăng bài (người dùng tạo bài viết mới)
 DELIMITER $$
@@ -148,7 +151,8 @@ begin
     end if;
 end $$
 DELIMITER ;
-
+CALL create_post(1, 'Bài test SQL', @msg);
+SELECT @msg;
 -- F03: thich/ huy thich bai viết 
 -- tăng like 
 DELIMITER $$
@@ -174,6 +178,8 @@ begin
     WHERE post_id = OLD.post_id;
 end $$
 DELIMITER ;
+-- test --
+INSERT INTO likes(post_id, user_id) VALUES (1, 2);
 -- F04 : Gửi lời mời kết bạn (Gửi lời mời kết bạn cho người dùng khác. Có cơ chế chặn gửi trùng lặp đảo chiều).
 DELIMITER $$
 create trigger make_friend
@@ -193,7 +199,9 @@ begin
      
 end $$
 DELIMITER ;
-
+-- test --
+INSERT INTO friends(user_id, friend_id, status)
+VALUES (1, 2, 'pending');
 -- F05: Chấp nhận/Hủy kết bạn (Cập nhật trạng thái status hoặc xóa bản ghi nếu hủy lời mời.)
 DELIMITER $$
 create procedure accept_friend (in friendship_id_in int, out message text)
@@ -233,6 +241,11 @@ begin
 	end if;
 end $$
 DELIMITER ;
+-- test --
+CALL accept_friend(1, @msg);
+SELECT @msg;
+CALL reject_friend(2, @msg);
+SELECT @msg;
 -- f06: Xem thông tin người dùng (Xem trang cá nhân của người dùng.)
 create view view_user_profile as
 select u.user_id, u.username, u.email, u.created_at, count(p.post_id) as total_posts
@@ -240,6 +253,7 @@ from users u
 join posts p
 on u.user_id = p.user_id
 group by u.user_id, u.username, u.email, u.created_at;
+SELECT * FROM view_user_profile;
 -- f07: Xem bài viết theo từ khóa (Tìm kiếm bài viết theo nội dung content.)
 ALTER TABLE posts
 ADD FULLTEXT(content);
@@ -251,6 +265,7 @@ begin
     where match(content) against (keywork);
 end $$
 DELIMITER ;
+CALL search_post('SQL');
 -- f08: báo cáo hoạt động 
 DELIMITER $$
 create procedure report_article (in user_id_in varchar(5), out message text)
@@ -272,7 +287,9 @@ begin
     end if;
 end $$
 DELIMITER ;
-
+-- test--
+CALL report_article(1, @msg);
+SELECT @msg;
 -- F09: Gợi ý kết bạn (Hệ thống gợi ý bạn bè (Mutual friends / Bạn của bạn).)
 DELIMITER $$
 create procedure suggest_friend (in user_id_in INT)
@@ -299,6 +316,8 @@ begin
     );
 end $$
 DELIMITER ;
+-- test --
+CALL suggest_friend(1);
 -- f10: xóa bai viết (Người dùng xóa bài viết của chính mình. Dữ liệu liên quan (likes, comments) được dọn dẹp bằng Cascade hoặc Transaction.)
 DELIMITER $$
 create procedure delete_post (in post_id_in varchar(5), in user_id_in varchar(5), out message text)
@@ -326,6 +345,9 @@ begin
     end if;
 end $$
 DELIMITER ;
+--test--
+CALL delete_post(1, 1, @msg);
+SELECT @msg;
 -- f11: Quản lý xóa tài khoản (Quản trị viên xóa tài khoản người dùng và tất cả dữ liệu phụ thuộc một cách an toàn.)
 DELIMITER $$
 create procedure delete_user (in user_id_in  int, out message text) 
@@ -359,3 +381,6 @@ begin
     set message = 'Xóa thành công';
 end $$ 
 DELIMITER ;
+-- test --
+CALL delete_user(3, @msg);
+SELECT @msg;
