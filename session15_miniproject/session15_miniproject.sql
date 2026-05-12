@@ -50,6 +50,46 @@ create table likes (
     foreign key (user_id) references users(user_id),
     UNIQUE(user_id, post_id)
 );
+-- tạo dữ liệu
+INSERT INTO users (username, password, email) VALUES
+('an', '123456', 'an@gmail.com'),
+('binh', '123456', 'binh@gmail.com'),
+('chi', '123456', 'chi@gmail.com'),
+('dung', '123456', 'dung@gmail.com'),
+('em', '123456', 'em@gmail.com');
+
+INSERT INTO posts (user_id, content) VALUES
+(1, 'Hôm nay học SQL khá vui'),
+(1, 'MySQL Stored Procedure rất hay'),
+(2, 'Đi cafe với bạn bè'),
+(3, 'Chạy project mini social network'),
+(4, 'Học database thật thú vị');
+
+INSERT INTO comments (post_id, user_id, content) VALUES
+(1, 2, 'Chuẩn luôn!'),
+(1, 3, 'Mình cũng đang học SQL'),
+(2, 4, 'Procedure hơi khó nhưng hay'),
+(3, 1, 'Chúc bạn hoàn thành tốt'),
+(5, 2, 'Database rất quan trọng');
+
+INSERT INTO friends (user_id, friend_id, status) VALUES
+(1, 2, 'accepted'),
+(1, 3, 'pending'),
+(2, 3, 'accepted'),
+(2, 4, 'pending'),
+(3, 5, 'accepted'),
+(4, 1, 'pending');
+
+INSERT INTO likes (post_id, user_id) VALUES
+(1, 2),
+(1, 3),
+(1, 4),
+(2, 3),
+(2, 5),
+(3, 1),
+(3, 2),
+(4, 5),
+(5, 1);
 
 -- F01 Đăng ký thành viên : Tạo tài khoản mới, kiểm tra trùng lặp thông tin, mã hóa mật khẩu.
 DELIMITER $$
